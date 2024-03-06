@@ -20,27 +20,22 @@ jobs:
 
       - name: Install necessary libraries
         run: |
-          cd scripts/market_data_source
+          cd scripts
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Execute Python Script
         env:
           URI: ${{ secrets.URI }}
-        run: python -m scripts.market_data_source.data_source
-
-      - name: Set git globals as correct user
-        run: |
-          git config --global user.email "7chris.jackson@gmail.com"
-          git config --global user.name "Chris"
+        run: python market_source.py
       
       - name: Add pickle file to staging area
-        run: git add stock_data.pkl
+        run: git add .
 
       - name: Commit pickle file to repository
-        run: git commit -m "Updated pickle file"
+        run: git commit -m "market data source update"
 
       - name: Set GitHub personal access token and push
         env:
-          GITHUB_TOKEN: ${{ secrets.MLOP_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.STOCKS_APP_TOKEN }}
         run: git push
