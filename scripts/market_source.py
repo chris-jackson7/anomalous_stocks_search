@@ -156,9 +156,9 @@ df = df.dropna(subset = ['ch1m', 'ch6m', TARGET_COLUMN]) # log_price
 print(df.shape)
 
 # Include Target & Sector Encodings in Model Columns
-S.append(TARGET_COLUMN)
-S.extend(list(encoded_sector.columns))
-df = df[S]
+MODEL_COLS.append(TARGET_COLUMN)
+MODEL_COLS.extend(list(encoded_sector.columns))
+df = df[MODEL_COLS]
 
 
 # Plot Row Missing Rate Distibution
