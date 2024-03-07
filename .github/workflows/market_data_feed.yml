@@ -13,9 +13,6 @@ jobs:
       - name: Access the repo
         uses: actions/checkout@v2
 
-      - name: Adjust permissions
-        run: sudo chmod -R u+w,o+w,g+w ./
-
       - name: Configure Python
         uses: actions/setup-python@v2
         with:
