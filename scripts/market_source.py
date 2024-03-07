@@ -156,9 +156,9 @@ df = df.dropna(subset = ['ch1m', 'ch6m', TARGET_COLUMN]) # log_price
 print(df.shape)
 
 # Include Target & Sector Encodings in Model Columns
-MODEL_COLS.append(TARGET_COLUMN)
-MODEL_COLS.extend(list(encoded_sector.columns))
-df = df[MODEL_COLS]
+S.append(TARGET_COLUMN)
+S.extend(list(encoded_sector.columns))
+df = df[S]
 
 
 # Plot Row Missing Rate Distibution
@@ -177,7 +177,7 @@ print(df.shape)
 imputer = KNNImputer(n_neighbors=15)
 df = pd.DataFrame(
     imputer.fit_transform(df),
-    columns = MODEL_COLUMNS,
+    columns = MODEL_COLS,
     index=symbols
 )
 
