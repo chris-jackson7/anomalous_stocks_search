@@ -28,7 +28,12 @@ jobs:
         env:
           URI: ${{ secrets.URI }}
         run: python scripts/market_source.py
-      
+
+      - name: Set git globals as correct user
+        run: |
+          git config --global user.email "7chris.jackson@gmail.com"
+          git config --global user.name "Chris"
+          
       - name: Add pickle file to staging area
         run: git add .
 
