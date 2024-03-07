@@ -5,7 +5,7 @@ CATEGORICAL_DROP_COLS = ['s', 'n', 'industry', 'marketCapCategory', 'sector', 'e
                             'country', 'fiscalYearEnd', 'payoutFrequency', 'isSpac', 'lastSplitType', 'inIndex', 'ipr']
 MODEL_COLS = ['sharesInsiders', 'asinh_roic', 'log_revenue', 'log_sharesYoY']
 ROW_MISSING_THRESHOLD = .15
-TARGET_COLUMN = 'log_marketCap' # log_price
+TARGET_COLUMN = 'log_marketCap' # 'log_price'
 
 LINKS = [
     {'name': 'Enterprise Value', 'for_value': 'enterpriseValue',
