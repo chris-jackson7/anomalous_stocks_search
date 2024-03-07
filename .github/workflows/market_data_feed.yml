@@ -35,10 +35,10 @@ jobs:
           git config --global user.name "Chris"
           
       - name: Add pickle file to staging area
-        run: git add .
-
-      - name: Commit pickle file to repository
-        run: git commit -m "market data source update"
+        run: |
+          git pull
+          git add .
+          git commit -m "market data source update"
 
       - name: Set GitHub personal access token and push
         env:
