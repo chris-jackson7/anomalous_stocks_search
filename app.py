@@ -1,10 +1,11 @@
 import pickle
-import numpy
+import numpy as np
 import pandas
 
 import plotly.express as px
 import dash
 from dash import html, dcc
+from dash.dependencies import Input, Output
 
 
 # Load Source Data
@@ -31,7 +32,11 @@ app = dash.Dash(__name__)
 
 # App Layout
 app.layout = html.Div([
-    html.H1("Interactive Scatter Plot"),
+    html.H1("Interactive Stock Anomalies"),
+    html.Div(style={'textAlign': 'center'}, children=[
+        html.H3("Anomaly Distributions", style={'marginBottom': 50}),
+        html.Img(id="static-plot", src=app.get_asset_url("anomaly_distributions.png"), style={'width': '100%', 'max-width': '800px'}),
+    ]),
     html.Div([
         html.Label("Anomaly Metric:"),
         dcc.Dropdown(
@@ -50,6 +55,13 @@ app.layout = html.Div([
     ]),
     dcc.Graph(id="scatter-plot")
 ])
+
+# Style for all elements
+app.layout.style = {
+    'backgroundColor': '#f5f5f5',
+    'margin': '20px',
+    'fontFamily': 'sans-serif',
+}
 
 # Update Callback
 @app.callback(
