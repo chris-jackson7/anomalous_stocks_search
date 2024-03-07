@@ -27,7 +27,7 @@ jobs:
       - name: Execute Python Script
         env:
           URI: ${{ secrets.URI }}
-        run: python market_source.py
+        run: python scripts/market_source.py
       
       - name: Add pickle file to staging area
         run: git add .
