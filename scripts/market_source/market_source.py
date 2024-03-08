@@ -290,7 +290,7 @@ anomaly_scores_df = pd.DataFrame({
 
 # Min Max Scaling
 scaler = MinMaxScaler
-anomaly_scores_df = scaler.fit_transform(anomaly_scores_df)
+anomaly_scores_df = scaler.fit_transform(anomaly_scores_df.values)
 search_df = pd.concat([search_df, anomaly_scores_df], axis=1)
 print(search_df.head())
 
