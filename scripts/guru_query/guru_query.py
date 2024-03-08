@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import time
 import aiohttp
 import asyncio
 import pickle
@@ -16,12 +17,6 @@ def main():
 
     df = pd.DataFrame({'gf_score': gf_score, 'gf_value': gf_value})
     df.index = tickers
-    # df['gf_score'].astype(int)
-    # df['gf_value'].astype(float)
-
-    # TODO: consider plotting missing rates
-    missing_rates = df.isnull().mean()
-    print(missing_rates)
 
     df.to_pickle('guru_focus.pkl')
 
@@ -72,6 +67,7 @@ async def fetch_stock_data_multiple(tickers, fetch_function, n_starting_tickers=
     for i, ticker in enumerate(tickers):
         tasks.append(asyncio.create_task(fetch_function(ticker)))
     results = await asyncio.gather(*tasks)
+    time.sleep(10)
   
     missing_tickers = [ticker for (result, ticker) in zip(results, tickers) if result is None]
     missing_percent = len(missing_tickers) / n_starting_tickers * 100
