@@ -7,7 +7,7 @@ import pickle
 
 # machine learning
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
 from sklearn.impute import KNNImputer
 from sklearn.ensemble import IsolationForest
 import xgboost as xgb
@@ -279,9 +279,14 @@ iso_score = iso_score - min(iso_score) + .001
 # 2D Z Scores
 z_score = np.linalg.norm(search_df[['y', 'pred']], axis=1)
 
-search_df['se'] = se
-search_df['iso'] = iso_score
-search_df['z_score'] = z_score
+# Min Max Scaling
+scaler = MinMaxScaler
+scaler.fit(se)
+search_df['se'] = scaler.transform(se)
+scaler.fit(iso_score)
+search_df['iso'] = scaler.transform(iso_score)
+scaler.fit(z_score)
+search_df['z_score'] = scaler.transofrm(z_score)
 
 # Plotting Anomaly Distributions
 fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(18, 6))
