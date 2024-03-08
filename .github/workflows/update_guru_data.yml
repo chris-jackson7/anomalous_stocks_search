@@ -2,8 +2,6 @@ name: market-data-feed
 
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: '30 * * * *' #Execute every 6 hours
 
 jobs:
   build:
@@ -27,7 +25,7 @@ jobs:
       - name: Execute Python Script
         env:
           URI: ${{ secrets.URI }}
-        run: python -m scripts/market_source/market_source
+        run: python -m scripts/guru_query/guru_query
 
       - name: Set git globals as correct user
         run: |
@@ -38,7 +36,7 @@ jobs:
         run: |
           git pull
           git add .
-          git commit -m "market data source update"
+          git commit -m "guru focus source update"
 
       - name: Set GitHub personal access token and push
         env:

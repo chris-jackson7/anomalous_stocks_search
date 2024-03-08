@@ -16,7 +16,7 @@ import xgboost as xgb
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from constants import (
+from ..constants import (
     LINKS, OBJECT_EXCLUDE_COLS, CATEGORICAL_DROP_COLS,
     MODEL_COLS, ROW_MISSING_THRESHOLD, TARGET_COLUMN
 )
@@ -132,7 +132,7 @@ encoded_sector.columns = [col.split('_')[1] for col in encoded_sector.columns]
 sector_dist = encoded_sector.sum(axis=0).sort_values()
 plt.barh(sector_dist.index, sector_dist, color='skyblue')
 plt.title('Sectors Distribution')
-plt.savefig('./plots/sector_distribution.png')
+plt.savefig('./assets/sector_distribution.png')
 
 encoded_sector.index = df.index
 df = pd.concat([df, encoded_sector], axis=1)
@@ -165,7 +165,7 @@ df = df[MODEL_COLS]
 rows_missing_rate = df.isnull().mean(axis=1)
 sns.kdeplot(rows_missing_rate)
 plt.title('Row Missing Rate Distribution')
-plt.savefig('./plots/row_missing_rate.png')
+plt.savefig('./assets/row_missing_rate.png')
 
 # Drop Rows w/ High Missing Rate
 df = df[rows_missing_rate < ROW_MISSING_THRESHOLD]
@@ -248,7 +248,7 @@ axes[2].grid(axis='x', linestyle='--', alpha=0.6)
 
 # Show the plot
 plt.tight_layout()
-plt.savefig('./plots/train_test_fit_feature_importance.png')
+plt.savefig('./assets/train_test_fit_feature_importance.png')
 
 
 def linear_fit_and_se(x, y):
@@ -291,7 +291,7 @@ sns.kdeplot(se, ax=axes[2])
 axes[0].set_title('Z Score Dist')
 axes[1].set_title('Isolation Score Dist')
 axes[2].set_title('log1p of Squared Error Dist')
-plt.savefig('./plots/anomaly_distributions.png')
+plt.savefig('./assets/anomaly_distributions.png')
 
 
 # Add Sector & Industry Back
