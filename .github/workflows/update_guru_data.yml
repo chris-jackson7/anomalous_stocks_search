@@ -18,7 +18,7 @@ jobs:
 
       - name: Install necessary libraries
         run: |
-          cd scripts
+          cd scripts/guru_query
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 

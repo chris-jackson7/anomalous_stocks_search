@@ -20,7 +20,7 @@ jobs:
 
       - name: Install necessary libraries
         run: |
-          cd scripts
+          cd scripts/market_source
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
