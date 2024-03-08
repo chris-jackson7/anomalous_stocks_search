@@ -67,6 +67,7 @@ async def fetch_stock_data_multiple(tickers, fetch_function, n_starting_tickers=
     for i, ticker in enumerate(tickers):
         tasks.append(asyncio.create_task(fetch_function(ticker)))
     results = await asyncio.gather(*tasks)
+    print(results[0:5])
     time.sleep(10)
   
     missing_tickers = [ticker for (result, ticker) in zip(results, tickers) if result is None]
