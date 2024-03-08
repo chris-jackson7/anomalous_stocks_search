@@ -1,4 +1,4 @@
-name: market-data-feed
+name: update-guru-data
 
 on:
   workflow_dispatch:
