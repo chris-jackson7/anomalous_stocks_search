@@ -282,7 +282,7 @@ iso_score = iso_score - min(iso_score) + .001
 # 2D Z Scores
 z_score = np.linalg.norm(search_df[['y', 'pred']], axis=1)
 
-anomly_scores_df = pd.DataFrame({
+anomaly_scores_df = pd.DataFrame({
     'se': se,
     'iso': iso_score,
     'z_score': z_score
