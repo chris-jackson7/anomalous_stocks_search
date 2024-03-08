@@ -279,14 +279,17 @@ iso_score = iso_score - min(iso_score) + .001
 # 2D Z Scores
 z_score = np.linalg.norm(search_df[['y', 'pred']], axis=1)
 
+anomly_scores_df = pd.DataFrame({
+    'se': se,
+    'iso': iso_score,
+    'z_score': z_score
+})
+
 # Min Max Scaling
 scaler = MinMaxScaler
-scaler.fit(se)
-search_df['se'] = scaler.transform(se)
-scaler.fit(iso_score)
-search_df['iso'] = scaler.transform(iso_score)
-scaler.fit(z_score)
-search_df['z_score'] = scaler.transofrm(z_score)
+anomaly_scores_df = scaler.fit_transform(anomaly_scores_df)
+search_df = pd.concat([search_df, anomaly_scores_df], axis=1)
+print(search_df.head())
 
 # Plotting Anomaly Distributions
 fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(18, 6))
