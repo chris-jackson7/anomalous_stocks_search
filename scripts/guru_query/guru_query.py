@@ -38,6 +38,7 @@ async def fetch_score_data(ticker):
                   print(e)
                   return
           else:
+              print(response.status)
               return
 
 
@@ -58,6 +59,7 @@ async def fetch_value_data(ticker):
                     print(e)
                     return
             else:
+                print(response.status)
                 return
 
 
