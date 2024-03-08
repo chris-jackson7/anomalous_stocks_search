@@ -290,13 +290,13 @@ anomaly_scores_df = pd.DataFrame({
 
 # Min Max Scaling
 scaler = MinMaxScaler()
-anomaly_scores_df = pd.DataFrame(scaler.fit_transform(anomaly_scores_df))
+anomaly_scores_df = pd.DataFrame(scaler.fit_transform(anomaly_scores_df), columns = ['se', 'iso', 'z_score'])
 search_df = pd.concat([search_df, anomaly_scores_df], axis=1)
 
 # Plotting Anomaly Distributions
 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(18, 6))
 sns.kdeplot(anomaly_scores_df['z_score'], ax=axes[0])
-sns.kdeplot(anomaly_scores_df['iso_score'], ax=axes[1])
+sns.kdeplot(anomaly_scores_df['iso'], ax=axes[1])
 sns.kdeplot(anomaly_scores_df['se'], ax=axes[2])
 axes[0].set_title('Z Score Dist')
 axes[1].set_title('Isolation Score Dist')
