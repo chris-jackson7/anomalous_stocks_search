@@ -27,6 +27,25 @@ def main():
     df.to_pickle('guru_focus.pkl')
 
 
+async def fetch_score_data(ticker):
+  gf_score_url = f"https://www.gurufocus.com/term/gf_score/{ticker.upper()}/GF-Score/{ticker.upper()}"
+
+  async with aiohttp.ClientSession() as session:
+      async with session.get(gf_score_url) as response:
+          if response.status == 200:
+              content = await response.read()
+              html_content = content.decode('latin-1')
+              soup = BeautifulSoup(html_content, "html.parser")
+              gf_score = soup.find("font", style="font-size: 24px; font-weight: 700; color: #337ab7")
+
+              try:
+                  return int(gf_score.text[2:gf_score.text.index('/100')])
+              except:
+                  return
+          else:
+              return
+
+
 async def fetch_value_data(ticker):
     gf_value_url = f"https://www.gurufocus.com/term/gf_value/{ticker.upper()}/GF-Value/{ticker.upper()}"
 
@@ -44,6 +63,7 @@ async def fetch_value_data(ticker):
                     return
             else:
                 return
+
 
 async def fetch_stock_data_multiple(tickers, fetch_function, n_starting_tickers=0):
     if n_starting_tickers == 0:
@@ -68,6 +88,7 @@ async def fetch_stock_data_multiple(tickers, fetch_function, n_starting_tickers=
                 results[i] = missed_results[0]
                 missed_results.pop(0)
         return results
+
 
 if __name__ == "__main__":
     main()
