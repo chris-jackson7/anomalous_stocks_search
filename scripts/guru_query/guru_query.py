@@ -34,7 +34,8 @@ async def fetch_score_data(ticker):
 
               try:
                   return int(gf_score.text[2:gf_score.text.index('/100')])
-              except:
+              except Exception as e:
+                  print(e)
                   return
           else:
               return
@@ -53,7 +54,8 @@ async def fetch_value_data(ticker):
 
                 try:
                     return float(gf_value.text[gf_value.text.index('$')+1:gf_value.text.index(' (')])
-                except:
+                except Exception as e:
+                    print(e)
                     return
             else:
                 return
