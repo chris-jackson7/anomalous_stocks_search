@@ -30,6 +30,8 @@ def filter_data(data, metric, high_thresh, low_thresh):
 # Initialize App
 app = dash.Dash(__name__)
 
+server = app.server
+
 # App Layout
 app.layout = html.Div([
     html.H1("Interactive Stock Anomalies"),
