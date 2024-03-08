@@ -25,7 +25,7 @@ jobs:
       - name: Execute Python Script
         env:
           URI: ${{ secrets.URI }}
-        run: python -m scripts/guru_query/guru_query
+        run: python -m scripts.guru_query.guru_query
 
       - name: Set git globals as correct user
         run: |

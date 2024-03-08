@@ -27,7 +27,7 @@ jobs:
       - name: Execute Python Script
         env:
           URI: ${{ secrets.URI }}
-        run: python -m scripts/market_source/market_source
+        run: python -m scripts.market_source.market_source
 
       - name: Set git globals as correct user
         run: |
