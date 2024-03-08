@@ -28,7 +28,10 @@ from ..constants import (
 def make_request(url: str, first: bool = False) -> pd.DataFrame:
 
     json = requests.get(url).json()
-    result = pd.DataFrame(json['data']['data'])
+    try:
+        result = pd.DataFrame(json['data']['data'])
+    except:
+        result = pd.DataFrame(json)
     result.index = result.iloc[:,0]
 
     if first:
