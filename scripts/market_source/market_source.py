@@ -284,7 +284,7 @@ z_score = np.linalg.norm(search_df[['y', 'pred']], axis=1)
 
 anomaly_scores_df = pd.DataFrame({
     'se': se,
-    'iso': iso_score,
+    'iso': max(iso_score) - iso_score, # reversing distribution to more closely match z_score and se
     'z_score': z_score
 })
 
