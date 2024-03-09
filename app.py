@@ -39,7 +39,7 @@ app.layout = html.Div([
     html.H1("Interactive Stock Anomalies"),
     html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
         html.H3("Anomaly Distributions", style={'marginBottom': 50}),
-        html.Img(id="static-plot", src=app.get_asset_url("anomaly_distributions.png"), style={'width': '100%', 'max-width': '800px'}),
+        html.Img(id="static-plot", src=app.get_asset_url("anomaly_distributions.png"), style={'width': '100%', 'max-width': '1600px'}),
     ]),
     html.Div(
         style={
@@ -107,8 +107,10 @@ def update_plot(metric, high_thresh, low_thresh):
     filtered_data["pred"] = filtered_data["pred"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
 
     fig = px.scatter(filtered_data, x="y", y="pred",
-                    text=filtered_data.index, color="color",
-                    color_discrete_sequence=px.colors.qualitative.Set3)
+                    text=filtered_data.index,
+                    # color="color",
+                    # color_discrete_sequence=px.colors.qualitative.Set3
+                    )
     
     # Add Reference Line
     if not filtered_data.empty:
@@ -137,7 +139,6 @@ def search_index(user_input, metric):
     if user_input != "" and user_input != "None":
         valid_user_input = [ticker for ticker in str(user_input).split(',') if ticker in search_df.index]
         if valid_user_input:
-            print(valid_user_input)
             search_df.loc[valid_user_input, 'color'] = 1
             
             df = search_df.copy()
