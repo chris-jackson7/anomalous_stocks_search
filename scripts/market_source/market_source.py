@@ -289,8 +289,9 @@ anomaly_scores_df = pd.DataFrame({
 })
 
 # Min Max Scaling
-scaler = MinMaxScaler()
-anomaly_scores_df = pd.DataFrame(scaler.fit_transform(anomaly_scores_df), columns = ['se', 'iso', 'z_score'])
+# scaler = MinMaxScaler()
+# anomaly_scores_df = pd.DataFrame(scaler.fit_transform(anomaly_scores_df), columns = ['se', 'iso', 'z_score'])
+
 search_df = pd.concat([search_df, anomaly_scores_df], axis=1)
 
 # Plotting Anomaly Distributions
