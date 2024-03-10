@@ -213,6 +213,12 @@ model = xgb.XGBRegressor(**params)  # Use XGBRegressor for regression, XGBRFRegr
 # Train the Model
 model.fit(X_train, y_train, eval_set=[(X_test, y_test)]) # , early_stopping_rounds=10
 
+# Extract Evaluation
+eval_results = model.evals_result()
+rmse = min(eval_results['validation']['rmse'])
+with open('assets/model_rmse.txt') as file:
+   file.write(rmse, 'w')
+
 # Make Predictions
 y_pred = model.predict(X_test)
 y_train_pred = model.predict(X_train)
@@ -271,7 +277,7 @@ pred.extend(y_train_pred)
 search_df = pd.DataFrame({'y': y, 'pred': pred}, index=index)
 
 # Standard Errors
-se = np.log1p(linear_fit_and_se(search_df['y'], search_df['pred']))
+se = np.log(linear_fit_and_se(search_df['y'], search_df['pred']))
 
 # Isolation Forest
 clf = IsolationForest(n_estimators=100, max_samples="auto", bootstrap=True)
@@ -283,14 +289,11 @@ iso_score = iso_score - min(iso_score) + .001
 z_score = np.linalg.norm(search_df[['y', 'pred']], axis=1)
 
 anomaly_scores_df = pd.DataFrame({
-    'se': se,
-    'iso': max(iso_score) - iso_score, # reversing distribution to more closely match z_score and se
-    'z_score': z_score
+    'se': se / max(se),
+    'iso': (max(iso_score) - iso_score) / max(iso_score), # reversing distribution to more closely match z_score and se
+    'z_score': z_score / max(z_score)
+    # scaled all to (0, 1)
 })
-
-# Min Max Scaling
-# scaler = MinMaxScaler()
-# anomaly_scores_df = pd.DataFrame(scaler.fit_transform(anomaly_scores_df), columns = ['se', 'iso', 'z_score'])
 
 search_df = pd.concat([search_df, anomaly_scores_df], axis=1)
 

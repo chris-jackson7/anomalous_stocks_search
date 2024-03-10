@@ -7,26 +7,38 @@ import dash
 from dash import html, dcc, dash_table
 from dash.dependencies import Input, Output
 
+from scripts.constants import TARGET_COLUMN
+
 
 # Load Source Data
 with open('search_df.pkl', 'rb') as file:
     search_df = pickle.load(file)
 
-search_df['color'] = [0] * len(search_df)
+with open('assets/model_rmse.txt', 'r') as file:
+    RMSE = file.read()
+
+# search_df['color'] = [0] * len(search_df)
 
 # Define Initial Parameters
 anomaly_metric = 'iso'
-high = 0.2
 low = 0.1
-user_input = ''
+high = 0.2
+sector = ''
+remove_drug_makers = False
+# user_input = ''
 
 # Define Filter Function
-def filter_data(data, metric, high_thresh, low_thresh):
-    search_mask = np.array(data['industry'] != 'Biotechnology') & \
-                  np.array(data['industry'] != 'Drug Manufacturers - Specialty & Generic') & \
-                  np.array(data[metric] < high_thresh) & \
+def filter_data(data, metric, high_thresh, low_thresh, sector, remove_drug_makers):
+    search_mask = np.array(data[metric] < high_thresh) & \
                   np.array(data[metric] > low_thresh)
-    return data.iloc[search_mask] #.sort_values(metric, ascending=False)
+    if sector:
+        search_mask = search_mask & np.array(data['sector'] == sector)
+    if remove_drug_makers:
+        search_mask = search_mask & \
+                  np.array(data['industry'] != 'Biotechnology') & \
+                  np.array(data['industry'] != 'Drug Manufacturers - Specialty & Generic')
+    print(sum(search_mask))
+    return data.iloc[search_mask].sort_values(metric, ascending=False)
 
 
 # Initialize App
@@ -37,6 +49,11 @@ server = app.server
 # App Layout
 app.layout = html.Div([
     html.H1("Interactive Stock Anomalies"),
+    html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
+        html.H3("XG Boost Model Fits & Feature Importance", style={'marginBottom': 25}),
+        html.P(f"target column: {TARGET_COLUMN} | model RMSE: {RMSE}", style={'marginBottom': 25}),
+        html.Img(id="model-fit-plot", src=app.get_asset_url("train_test_fit_feature_importance.png"), style={'width': '100%', 'max-width': '1600px'}),
+    ]),
     html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
         html.H3("Anomaly Distributions", style={'marginBottom': 50}),
         html.Img(id="static-plot", src=app.get_asset_url("anomaly_distributions.png"), style={'width': '100%', 'max-width': '1600px'}),
@@ -54,6 +71,8 @@ app.layout = html.Div([
                         'justify-content': 'center',  # Center inputs horizontally
                         'width': '50%',  # Adjust width for inputs (optional)
                         'marginBottom': 50,
+                        'margin-left': '10px',
+                        'margin-right': '10px'
                     }, children=[
                         html.Div(style={
                                 #'display': 'flex',
@@ -69,11 +88,25 @@ app.layout = html.Div([
                                             {'label': 'Squared Error', 'value': 'se'}],
                                     value=anomaly_metric
                                 ),
-                            ]),     
+                                html.Label("Sector:"),
+                                dcc.Dropdown(
+                                    id="sector-dropdown",
+                                    options=[{'label': sector, 'value': sector} for sector in search_df['sector'].unique()],
+                                    value=''
+                                ),
+                            ]),
+                        html.Label("Low Threshold:"),
+                        dcc.Input(id="low-threshold", type="number", value=low),  
                         html.Label("High Threshold:"),
                         dcc.Input(id="high-threshold", type="number", value=high),
-                        html.Label("Low Threshold:"),
-                        dcc.Input(id="low-threshold", type="number", value=low),
+                        html.Label("Drug Makers:"),
+                        dcc.Checklist(
+                            id="remove-drug-makers",
+                            options=[
+                                {'label': 'remove', 'value': True},
+                            ],
+                            value=remove_drug_makers
+                        ),
             ]),
             dcc.Graph(id="scatter-plot")
     ]),
@@ -97,37 +130,43 @@ app.layout.style = {
      Output("user-input-table", "children")],
     [Input("metric-dropdown", "value"),
      Input("high-threshold", "value"),
-     Input("low-threshold", "value")]
+     Input("low-threshold", "value"),
+     Input("sector", "value"),
+     Input("remove-drug-makers", "value")]
 )
-def update_plot(metric, high_thresh, low_thresh):
-    filtered_data = filter_data(search_df.copy(), metric, high_thresh, low_thresh)
+def update_plot(metric, high_thresh, low_thresh, sector, remove_drug_makers):
+    try:
+        filtered_data = filter_data(search_df.copy(), metric, high_thresh, low_thresh, sector, remove_drug_makers)
 
-    JITTER = .2
-    filtered_data["y"] = filtered_data["y"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
-    filtered_data["pred"] = filtered_data["pred"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
+        # TODO: consider toggle for jittering
+        # JITTER = .2
+        # filtered_data["y"] = filtered_data["y"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
+        # filtered_data["pred"] = filtered_data["pred"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
 
-    fig = px.scatter(filtered_data, x="y", y="pred",
-                    text=filtered_data.index,
-                    # color="color",
-                    # color_discrete_sequence=px.colors.qualitative.Set3
-                    )
-    
-    # Add Reference Line
-    if not filtered_data.empty:
-        fig.add_shape(
-            type="line",
-            x0=min(filtered_data["y"]) - 1,
-            y0=min(filtered_data["y"]) - 1,
-            x1=max(filtered_data["pred"]) + 1,
-            y1=max(filtered_data["pred"]) + 1,
-            line=dict(color="red", dash="dash")
-        )
+        fig = px.scatter(filtered_data, x="y", y="pred",
+                        text=filtered_data.index
+                        # color="color",
+                        # color_discrete_sequence=px.colors.qualitative.Set3
+                        )
+        
+        # Add Reference Line
+        if not filtered_data.empty:
+            fig.add_shape(
+                type="line",
+                x0=min(filtered_data["y"]) - 1,
+                y0=min(filtered_data["y"]) - 1,
+                x1=max(filtered_data["pred"]) + 1,
+                y1=max(filtered_data["pred"]) + 1,
+                line=dict(color="red", dash="dash")
+            )
 
-    # Add Grid
-    fig.update_layout(xaxis_showgrid=True, yaxis_showgrid=True)
-    fig.update_layout(width=1600, height=800)
+        # Add Grid
+        fig.update_layout(xaxis_showgrid=True, yaxis_showgrid=True)
+        fig.update_layout(width=1600, height=800)
 
-    return fig, search_index(','.join(filtered_data.index), metric)
+        return fig, search_index(','.join(filtered_data.index))
+    except Exception as e:
+        print(e)
     
 
 # @app.callback(
@@ -135,7 +174,7 @@ def update_plot(metric, high_thresh, low_thresh):
 #     Input("user-input", "n_submit"),
 #     debounce_time=1000
 # )
-def search_index(user_input, metric):
+def search_index(user_input):
     if user_input != "" and user_input != "None":
         valid_user_input = [ticker for ticker in str(user_input).split(',') if ticker in search_df.index]
         if valid_user_input:
@@ -146,8 +185,8 @@ def search_index(user_input, metric):
             df.insert(0, 'symbol', df.index)
             if not df.empty:
                 table = dash_table.DataTable(
-                    data=df.sort_values(metric, ascending=False).to_dict('records'),
-                    columns=[{'name': col, 'id': col} for col in df.columns] # .drop("color", axis=1)
+                    data=df.to_dict('records'),
+                    columns=[{'name': col, 'id': col} for col in df.columns]
                 )
                 return table
         else:
