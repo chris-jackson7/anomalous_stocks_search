@@ -17,12 +17,17 @@ with open('search_df.pkl', 'rb') as file:
 with open('assets/model_rmse.txt', 'r') as file:
     RMSE = file.read()
 
+target_map = {
+    'log_marketCap': 'log of Market Cap',
+    'log_price': 'log of Price'
+}
+
 # search_df['color'] = [0] * len(search_df)
 
 # Define Initial Parameters
 anomaly_metric = 'iso'
-low = 0.1
-high = 0.2
+low = 0.5
+high = 0.8
 sector = ''
 remove_drug_makers = False
 # user_input = ''
@@ -37,7 +42,6 @@ def filter_data(data, metric, high_thresh, low_thresh, sector, remove_drug_maker
         search_mask = search_mask & \
                   np.array(data['industry'] != 'Biotechnology') & \
                   np.array(data['industry'] != 'Drug Manufacturers - Specialty & Generic')
-    print(sum(search_mask))
     return data.iloc[search_mask].sort_values(metric, ascending=False)
 
 
@@ -51,7 +55,8 @@ app.layout = html.Div([
     html.H1("Interactive Stock Anomalies"),
     html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
         html.H3("XG Boost Model Fits & Feature Importance", style={'marginBottom': 25}),
-        html.P(f"target column: {TARGET_COLUMN} | model RMSE: {RMSE}", style={'marginBottom': 25}),
+        html.P(f"target column: {target_map[TARGET_COLUMN]}"),
+        html.P(f"model rmse: {round(float(RMSE), 4)}", style={'marginBottom': 25}),
         html.Img(id="model-fit-plot", src=app.get_asset_url("train_test_fit_feature_importance.png"), style={'width': '100%', 'max-width': '1600px'}),
     ]),
     html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
@@ -71,14 +76,14 @@ app.layout = html.Div([
                         'justify-content': 'center',  # Center inputs horizontally
                         'width': '50%',  # Adjust width for inputs (optional)
                         'marginBottom': 50,
-                        'margin-left': '10px',
-                        'margin-right': '10px'
                     }, children=[
                         html.Div(style={
                                 #'display': 'flex',
                                 'justify-content': 'center',
                                 'width': '50%',
                                 'marginBottom': 25,
+                                'margin-left': '10px',
+                                'margin-right': '10px'
                             }, children = [
                                 html.Label("Anomaly Metric:"),
                                 dcc.Dropdown(
@@ -91,14 +96,14 @@ app.layout = html.Div([
                                 html.Label("Sector:"),
                                 dcc.Dropdown(
                                     id="sector-dropdown",
-                                    options=[{'label': sector, 'value': sector} for sector in search_df['sector'].unique()],
-                                    value=''
+                                    options=[{'label': sec, 'value': sec} for sec in search_df['sector'].unique()],
+                                    value=sector
                                 ),
                             ]),
                         html.Label("Low Threshold:"),
-                        dcc.Input(id="low-threshold", type="number", value=low),  
+                        dcc.Input(id="low-threshold", type="number", value=low, step=.1),  
                         html.Label("High Threshold:"),
-                        dcc.Input(id="high-threshold", type="number", value=high),
+                        dcc.Input(id="high-threshold", type="number", value=high, step=.1),
                         html.Label("Drug Makers:"),
                         dcc.Checklist(
                             id="remove-drug-makers",
@@ -110,10 +115,37 @@ app.layout = html.Div([
             ]),
             dcc.Graph(id="scatter-plot")
     ]),
-    html.Div([
-        # html.Label('Search by Ticker(s) ex: APPL,MSFT,NVDA:'),
-        # dcc.Input(id='user-input', type='text', value="", n_submit=0),
-        html.Div(id='user-input-table')
+    html.Div(style={'width': '100%', 'max-width': '1600px', 'alignItems': 'center'}, children=[
+                # html.Label('Search by Ticker(s) ex: APPL,MSFT,NVDA:'),
+                # dcc.Input(id='user-input', type='text', value="", n_submit=0),
+                html.Div(style={
+                                #'display': 'flex',
+                                'textAlign': 'center',
+                                'width': '100%',
+                                'marginBottom': 25,
+                            }, children=[
+                                html.P(style = {'textAlign': 'center'}, children=[
+                                    'View ',
+                                    html.A('source code',
+                                       href='https://github.com/chris-jackson7/anomalous_stocks_search',
+                                       target='_blank'),
+                                    ' or ',
+                                    html.A('download raw data',
+                                       href='https://github.com/chris-jackson7/anomalous_stocks_search/blob/main/market_data_transformed.pkl',
+                                       target='_blank')
+                                    ]),
+                                # html.P(style = {'textAlign': 'center'}, children=[
+                                #     'Find something good? ',
+                                #     html.A('Buy me a share!',
+                                #        href='', target='_blank')
+                                #     ])
+                ]),
+                html.Div(style={
+                    'width': '100%',
+                    'max-width': '1600px',
+                    'alignItems': 'center',
+                    'display': 'flex',
+                    'margin-left': '300px'}, id='user-input-table')
     ])
 ])
 
@@ -131,10 +163,10 @@ app.layout.style = {
     [Input("metric-dropdown", "value"),
      Input("high-threshold", "value"),
      Input("low-threshold", "value"),
-     Input("sector", "value"),
+     Input("sector-dropdown", "value"),
      Input("remove-drug-makers", "value")]
 )
-def update_plot(metric, high_thresh, low_thresh, sector, remove_drug_makers):
+def update_plot(metric, high_thresh, low_thresh, sector='', remove_drug_makers=False):
     try:
         filtered_data = filter_data(search_df.copy(), metric, high_thresh, low_thresh, sector, remove_drug_makers)
 
@@ -181,7 +213,7 @@ def search_index(user_input):
             search_df.loc[valid_user_input, 'color'] = 1
             
             df = search_df.copy()
-            df = df.loc[valid_user_input, ['y', 'pred', 'se', 'iso', 'z_score', 'sector', 'industry']]
+            df = df.loc[valid_user_input, ['y', 'pred', 'se', 'iso', 'z_score', 'sector', 'industry', 'log_sharesYoY', 'log_revenue', 'asinh_roic', 'sharesInsiders']]
             df.insert(0, 'symbol', df.index)
             if not df.empty:
                 table = dash_table.DataTable(

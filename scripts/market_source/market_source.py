@@ -276,7 +276,7 @@ pred.extend(y_train_pred)
 search_df = pd.DataFrame({'y': y, 'pred': pred}, index=index)
 
 # Standard Errors
-se = np.log(linear_fit_and_se(search_df['y'], search_df['pred']))
+se = linear_fit_and_se(search_df['y'], search_df['pred'])
 
 # Isolation Forest
 clf = IsolationForest(n_estimators=100, max_samples="auto", bootstrap=True)
@@ -301,9 +301,9 @@ fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(18, 6))
 sns.kdeplot(anomaly_scores_df['z_score'], ax=axes[0])
 sns.kdeplot(anomaly_scores_df['iso'], ax=axes[1])
 sns.kdeplot(anomaly_scores_df['se'], ax=axes[2])
-axes[0].set_title('Z Score Dist')
-axes[1].set_title('Isolation Score Dist')
-axes[2].set_title('log1p of Squared Error Dist')
+axes[0].set_title('Z Score')
+axes[1].set_title('Isolation Score')
+axes[2].set_title('Squared Error')
 plt.savefig('./assets/anomaly_distributions.png')
 
 
