@@ -214,8 +214,7 @@ model = xgb.XGBRegressor(**params)  # Use XGBRegressor for regression, XGBRFRegr
 model.fit(X_train, y_train, eval_set=[(X_test, y_test)]) # , early_stopping_rounds=10
 
 # Extract Evaluation
-eval_results = model.evals_result()
-rmse = min(eval_results['validation']['rmse'])
+rmse = min(model.evals_result()['validation_0']['rmse'])
 with open('assets/model_rmse.txt') as file:
    file.write(rmse, 'w')
 
