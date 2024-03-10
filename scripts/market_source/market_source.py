@@ -216,7 +216,7 @@ model.fit(X_train, y_train, eval_set=[(X_test, y_test)]) # , early_stopping_roun
 # Extract Evaluation
 rmse = min(model.evals_result()['validation_0']['rmse'])
 with open('assets/model_rmse.txt', 'w') as file:
-   file.write(rmse)
+   file.write(str(rmse))
 
 # Make Predictions
 y_pred = model.predict(X_test)
