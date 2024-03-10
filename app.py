@@ -3,6 +3,7 @@ import numpy as np
 import pandas
 
 import plotly.express as px
+import plotly.graph_objects as go
 import dash
 from dash import html, dcc, dash_table
 from dash.dependencies import Input, Output
@@ -52,6 +53,9 @@ server = app.server
 
 # App Layout
 app.layout = html.Div([
+    html.Header([
+        html.Link(rel='stylesheet', type='text/css', href='assets/stylesheet.css')
+    ]),
     html.H1("Interactive Stock Anomalies"),
     html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
         html.H3("XG Boost Model Fits & Feature Importance", style={'marginBottom': 25}),
@@ -64,6 +68,7 @@ app.layout = html.Div([
         html.Img(id="static-plot", src=app.get_asset_url("anomaly_distributions.png"), style={'width': '100%', 'max-width': '1600px'}),
     ]),
     html.Div(
+        id='graph_container',
         style={
             'display': 'flex',
             'flex-direction': 'column',  # Stack vertically
@@ -113,7 +118,7 @@ app.layout = html.Div([
                             value=remove_drug_makers
                         ),
             ]),
-            dcc.Graph(id="scatter-plot")
+            dcc.Graph(id="scatter-plot"),
     ]),
     html.Div(style={'width': '100%', 'max-width': '1600px', 'alignItems': 'center'}, children=[
                 # html.Label('Search by Ticker(s) ex: APPL,MSFT,NVDA:'),
@@ -156,6 +161,9 @@ app.layout.style = {
     'fontFamily': 'sans-serif',
 }
 
+
+
+
 # Plot Update Callback
 @app.callback(
     [Output("scatter-plot", "figure"),
@@ -174,6 +182,39 @@ def update_plot(metric, high_thresh, low_thresh, sector='', remove_drug_makers=F
         # JITTER = .2
         # filtered_data["y"] = filtered_data["y"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
         # filtered_data["pred"] = filtered_data["pred"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
+
+        # fig = go.Figure(
+        #     data=[
+        #         go.Scatter(
+        #             x=filtered_data["y"],
+        #             y=filtered_data["pred"],
+        #             text=filtered_data.index,
+        #             marker=dict(
+        #                 size=5,
+        #                 color="blue",
+        #                 opacity=0.7
+        #             ),
+        #             mode='markers'
+        #         )
+        #     ],
+        #     layout=go.Layout(
+        #         # Add reference line conditionally
+        #         shapes=[{
+        #             'type': 'line',
+        #             'x0': min(filtered_data["y"]) - 1,
+        #             'y0': min(filtered_data["y"]) - 1,
+        #             'x1': max(filtered_data["pred"]) + 1,
+        #             'y1': max(filtered_data["pred"]) + 1,
+        #             'line': {'color': 'red', 'dash': 'dash'}
+        #         }] if not filtered_data.empty else [],
+
+        #         # Add grid lines
+        #         xaxis_showgrid=True,
+        #         yaxis_showgrid=True,
+
+        #         autosize=True  # Enable autosizing
+        #     )
+        # )
 
         fig = px.scatter(filtered_data, x="y", y="pred",
                         text=filtered_data.index

@@ -1,0 +1,37 @@
+/* Adaptive margin-left for different screen sizes */
+@media (max-width: 768px) { /* Adjust for smaller screens */
+    .user-input-table {
+        margin-left: 0px;  
+    }
+    .graph-container {
+        width: 20%; 
+    }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+    .user-input-table { /* Adjust for medium screens */
+        margin-left: 25px;  
+    }
+    .graph-container {
+        width: 50%; 
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1200px) {
+    .user-input-table { /* Adjust for larger screens */
+        margin-left: 50px;  
+    }
+    .graph-container {
+        width: 80%; 
+    }
+}
+
+/* Target your DataTable and graph using the class */
+#user-input-table, .user-input-table {
+    margin-left: 300px;
+}
+
+
+#scatter-plot .graph-container {
+    width: 100%; /* Allow full width for now */
+}
