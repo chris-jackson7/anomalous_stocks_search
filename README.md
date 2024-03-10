@@ -1,6 +1,6 @@
 # anomalous_stocks_search
 
-This repository contains my heroku dash app and any scripts which feed data into it. The market_source folder contains all of the current content on the site, and I hope to get the guru_query script working again too (currently being blocked from making requests).
+This repository contains my [heroku dash app](https://anomalous-stocks-761f7ea35d00.herokuapp.com/) and any scripts which feed data into it. The market_source folder contains all of the current content on the site, and I hope to get the guru_query script working again too (currently being blocked from making requests).
 
 I'm pulling market data daily from https://stockanalysis.com/api/screener api and related endpoints found in scripts/constants.py > LINKS. I clean and transform the data (market_data_transformed.pkl) resulting in a search of ~5100 stocks and then use an xgboost model to predict stock price across the dataset. I chose an xgboost model to learn as many linear relationships as possible in the source data. The model feature columns were chosen because of their relatively low missing rate and trial/error evidence of importance. 
 
