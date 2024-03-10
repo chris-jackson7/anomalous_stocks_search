@@ -211,7 +211,7 @@ params = {
 model = xgb.XGBRegressor(**params)  # Use XGBRegressor for regression, XGBRFRegressor for classification
 
 # Train the Model
-model.fit(X_train, y_train, eval_set=[(X_test, y_test)], eval_metric='rmse') # , early_stopping_rounds=10
+model.fit(X_train, y_train, eval_set=[(X_test, y_test)]) # , early_stopping_rounds=10
 
 # Extract Evaluation
 eval_results = model.evals_result()
