@@ -2,9 +2,9 @@ name: market-data-feed
 
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: '30 * * * *' #Execute every 6 hours
-
+  schedule:
+     - cron: '15 21 * * MON-FRI' # Executes end of market day 2:15pm MT (8:15pm UTC)
+     
 jobs:
   build:
     runs-on: ubuntu-latest
