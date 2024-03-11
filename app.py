@@ -57,6 +57,7 @@ app.layout = html.Div([
         html.Link(rel='stylesheet', type='text/css', href='assets/stylesheet.css')
     ]),
     html.H1("Interactive Stock Anomalies"),
+    html.H3(f"Last Updated: {''}"),
     html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
         html.H3("XG Boost Model Fits & Feature Importance", style={'marginBottom': 25}),
         html.P(f"target column: {target_map[TARGET_COLUMN]}"),
@@ -139,11 +140,11 @@ app.layout = html.Div([
                                        href='https://github.com/chris-jackson7/anomalous_stocks_search/blob/main/market_data_transformed.pkl',
                                        target='_blank')
                                     ]),
-                                # html.P(style = {'textAlign': 'center'}, children=[
-                                #     'Find something good? ',
-                                #     html.A('Buy me a share!',
-                                #        href='', target='_blank')
-                                #     ])
+                                html.P(style = {'textAlign': 'center'}, children=[
+                                    'Find something good? ',
+                                    html.A('Buy me a share!',
+                                       href='https://paypal.me/ChrisJackson7?country.x=US&locale.x=en_US',target='_blank')
+                                    ])
                 ]),
                 html.Div(style={
                     'width': '100%',
@@ -182,39 +183,6 @@ def update_plot(metric, high_thresh, low_thresh, sector='', remove_drug_makers=F
         # JITTER = .2
         # filtered_data["y"] = filtered_data["y"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
         # filtered_data["pred"] = filtered_data["pred"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
-
-        # fig = go.Figure(
-        #     data=[
-        #         go.Scatter(
-        #             x=filtered_data["y"],
-        #             y=filtered_data["pred"],
-        #             text=filtered_data.index,
-        #             marker=dict(
-        #                 size=5,
-        #                 color="blue",
-        #                 opacity=0.7
-        #             ),
-        #             mode='markers'
-        #         )
-        #     ],
-        #     layout=go.Layout(
-        #         # Add reference line conditionally
-        #         shapes=[{
-        #             'type': 'line',
-        #             'x0': min(filtered_data["y"]) - 1,
-        #             'y0': min(filtered_data["y"]) - 1,
-        #             'x1': max(filtered_data["pred"]) + 1,
-        #             'y1': max(filtered_data["pred"]) + 1,
-        #             'line': {'color': 'red', 'dash': 'dash'}
-        #         }] if not filtered_data.empty else [],
-
-        #         # Add grid lines
-        #         xaxis_showgrid=True,
-        #         yaxis_showgrid=True,
-
-        #         autosize=True  # Enable autosizing
-        #     )
-        # )
 
         fig = px.scatter(filtered_data, x="y", y="pred",
                         text=filtered_data.index
