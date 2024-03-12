@@ -25,7 +25,7 @@ from ..constants import (
 
 # saving time of last run
 with open('./assets/last_updated.txt', 'w') as file:
-    file.write(datetime.now())
+    file.write(datetime.now().strftime("%Y-%m-%d"))
 
 ##### COLLECTING DATA FROM API #####
 
