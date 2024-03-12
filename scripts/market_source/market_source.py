@@ -23,6 +23,10 @@ from ..constants import (
 )
 
 
+# saving time of last run
+with open('./assets/last_updated.txt', 'w') as file:
+    file.write(datetime.now())
+
 ##### COLLECTING DATA FROM API #####
 
 
