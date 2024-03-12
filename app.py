@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 import pandas
+from datetime import datetime
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -17,6 +18,10 @@ with open('search_df.pkl', 'rb') as file:
 
 with open('assets/model_rmse.txt', 'r') as file:
     RMSE = file.read()
+
+with open('assets/last_updated.txt', 'r') as file:
+    LAST_UPDATED = file.read()
+
 
 target_map = {
     'log_marketCap': 'log of Market Cap',
@@ -57,7 +62,7 @@ app.layout = html.Div([
         html.Link(rel='stylesheet', type='text/css', href='assets/stylesheet.css')
     ]),
     html.H1("Interactive Stock Anomalies"),
-    html.H3(f"Last Updated: {''}"),
+    html.H3(f"Last Updated: {LAST_UPDATED}"),
     html.Div(style={'textAlign': 'center', 'marginBottom': 50}, children=[
         html.H3("XG Boost Model Fits & Feature Importance", style={'marginBottom': 25}),
         html.P(f"target column: {target_map[TARGET_COLUMN]}"),
