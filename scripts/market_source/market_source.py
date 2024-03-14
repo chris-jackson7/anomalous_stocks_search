@@ -5,6 +5,7 @@ import os
 import sys
 import pickle
 from datetime import datetime
+import time
 
 # machine learning
 from sklearn.model_selection import train_test_split
@@ -65,6 +66,25 @@ URL = 'https://stockanalysis.com/api/screener/s/i'
 dfs = [make_request(URL, True)]
 dfs.extend([make_request(link['link']) for link in LINKS])
 df = merge_data(dfs)
+
+
+##### SAVING PRICE & VOLUME DATA #####
+
+
+def update_time_data(column: str) -> None:
+    file_name = f"{column}_over_time.pkl"
+
+    if file_name in os.listdir():
+        with open(file_name, 'rb') as file:
+            historical_data = pickle.load(file)
+
+        updated_data = pd.merge(historical_data, df[column], on='s')
+        pickle.dump(updated_data, open(file_name, 'wb'))
+    else:
+        pickle.dump(df[['s', column]], open(file_name, 'wb'))
+
+update_time_data('price')
+update_time_data('volume')
 
 
 ##### CLEANING & IMPUTING RAW DATA #####
