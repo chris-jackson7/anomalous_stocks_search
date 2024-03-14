@@ -78,7 +78,7 @@ def update_time_data(column: str) -> None:
         with open(file_name, 'rb') as file:
             historical_data = pickle.load(file)
 
-        updated_data = pd.merge(historical_data, df[column], on='s')
+        updated_data = pd.merge(historical_data, df[['s', column]], on='s')
         pickle.dump(updated_data, open(file_name, 'wb'))
     else:
         pickle.dump(df[['s', column]], open(file_name, 'wb'))
