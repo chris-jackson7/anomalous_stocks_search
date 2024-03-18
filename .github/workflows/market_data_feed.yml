@@ -3,7 +3,7 @@ name: market-data-feed
 on:
   workflow_dispatch:
   schedule:
-     - cron: '15 20 * * MON-FRI' # Executes end of market day 2:15pm MT (8:15pm UTC)
+     - cron: '45 20 * * MON-FRI' # Executes end of market day 2:45pm MT (8:45pm UTC)
      
 jobs:
   build:
