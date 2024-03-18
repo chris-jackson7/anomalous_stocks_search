@@ -83,8 +83,8 @@ def update_time_data(column: str) -> None:
     else:
         pickle.dump(df[['s', column]], open(file_name, 'wb'))
 
-update_time_data('price')
-update_time_data('volume')
+# update_time_data('price')
+# update_time_data('volume')
 
 
 ##### CLEANING & IMPUTING RAW DATA #####
