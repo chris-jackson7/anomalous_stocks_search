@@ -301,7 +301,7 @@ pred.extend(y_train_pred)
 search_df = pd.DataFrame({'y': y, 'pred': pred}, index=index)
 
 # Standard Errors
-se = linear_fit_and_se(search_df['y'], search_df['pred'])
+se = np.log(linear_fit_and_se(search_df['y'], search_df['pred']))
 
 # Isolation Forest
 clf = IsolationForest(n_estimators=100, max_samples="auto", bootstrap=True)

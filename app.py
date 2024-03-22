@@ -15,6 +15,7 @@ from scripts.constants import TARGET_COLUMN
 # Load Source Data
 with open('search_df.pkl', 'rb') as file:
     search_df = pickle.load(file)
+search_df = search_df.rename({'y': 'actual', 'pred': 'predicted'}, axis=1)
 
 with open('assets/model_rmse.txt', 'r') as file:
     RMSE = file.read()
@@ -112,9 +113,9 @@ app.layout = html.Div([
                                 ),
                             ]),
                         html.Label("Low Threshold:"),
-                        dcc.Input(id="low-threshold", type="number", value=low, step=.1),  
+                        dcc.Input(id="low-threshold", type="number", value=low, step=.01),  
                         html.Label("High Threshold:"),
-                        dcc.Input(id="high-threshold", type="number", value=high, step=.1),
+                        dcc.Input(id="high-threshold", type="number", value=high, step=.01), 
                         html.Label("Drug Makers:"),
                         dcc.Checklist(
                             id="remove-drug-makers",
@@ -143,7 +144,8 @@ app.layout = html.Div([
                                     ' or ',
                                     html.A('download raw data',
                                        href='https://github.com/chris-jackson7/anomalous_stocks_search/blob/main/market_data_transformed.pkl',
-                                       target='_blank')
+                                       target='_blank'),
+                                    '.'
                                     ]),
                                 html.P(style = {'textAlign': 'center'}, children=[
                                     'Find something good? ',
@@ -189,7 +191,7 @@ def update_plot(metric, high_thresh, low_thresh, sector='', remove_drug_makers=F
         # filtered_data["y"] = filtered_data["y"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
         # filtered_data["pred"] = filtered_data["pred"] + JITTER * (2 * np.random.rand(len(filtered_data)) - 1)
 
-        fig = px.scatter(filtered_data, x="y", y="pred",
+        fig = px.scatter(filtered_data, x="actual", y="predicted",
                         text=filtered_data.index
                         # color="color",
                         # color_discrete_sequence=px.colors.qualitative.Set3
@@ -199,12 +201,31 @@ def update_plot(metric, high_thresh, low_thresh, sector='', remove_drug_makers=F
         if not filtered_data.empty:
             fig.add_shape(
                 type="line",
-                x0=min(filtered_data["y"]) - 1,
-                y0=min(filtered_data["y"]) - 1,
-                x1=max(filtered_data["pred"]) + 1,
-                y1=max(filtered_data["pred"]) + 1,
+                x0=min(filtered_data["actual"]) - 1,
+                y0=min(filtered_data["actual"]) - 1,
+                x1=max(filtered_data["predicted"]) + 1,
+                y1=max(filtered_data["predicted"]) + 1,
                 line=dict(color="red", dash="dash")
             )
+
+        # Add Annotations
+        undervalued = dict(
+            x=-2.5,
+            y=2.5,
+            text="Undervalued",
+            showarrow=False,
+            font=dict(size=16)
+        )
+        overvalued = dict(
+            x=2.5,
+            y=-2.5,
+            text="Overvalued",
+            showarrow=False,
+            font=dict(size=16)
+        )
+
+        fig.add_annotation(undervalued)
+        fig.add_annotation(overvalued)
 
         # Add Grid
         fig.update_layout(xaxis_showgrid=True, yaxis_showgrid=True)
@@ -227,7 +248,7 @@ def search_index(user_input):
             search_df.loc[valid_user_input, 'color'] = 1
             
             df = search_df.copy()
-            df = df.loc[valid_user_input, ['y', 'pred', 'se', 'iso', 'z_score', 'sector', 'industry', 'log_sharesYoY', 'log_revenue', 'asinh_roic', 'sharesInsiders']]
+            df = df.loc[valid_user_input, ['actual', 'predicted', 'se', 'iso', 'z_score', 'sector', 'industry', 'log_sharesYoY', 'log_revenue', 'asinh_roic', 'sharesInsiders']]
             df.insert(0, 'symbol', df.index)
             if not df.empty:
                 table = dash_table.DataTable(
